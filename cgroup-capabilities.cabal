@@ -19,21 +19,46 @@ maintainer:         connornjames@gmail.com
 -- category:
 extra-source-files: CHANGELOG.md
 
+common lang
+  default-language:   Haskell2010
+  default-extensions:
+    OverloadedStrings
+    ImportQualifiedPost
+
+  ghc-options:
+    -Wall -Wincomplete-uni-patterns -Wcompat
+    -Wincomplete-record-updates -Wmissing-home-modules
+    -Wmissing-export-lists -Wredundant-constraints
+
 library
-    exposed-modules:  MyLib
+  import:          lang
 
-    -- Modules included in this library but not exported.
-    -- other-modules:
+  -- cabal-fmt: expand src
+  exposed-modules:
+    System.CGroup
+    System.CGroup.CPU
+    System.CGroup.Types
 
-    -- LANGUAGE extensions used by modules in this package.
-    -- other-extensions:
-    build-depends:    base ^>=4.14.3.0
-    hs-source-dirs:   src
-    default-language: Haskell2010
+  build-depends:
+    , base        ^>=4.14.3.0
+    , megaparsec
+    , path
+    , text
 
-test-suite cgroup-capabilities-test
-    default-language: Haskell2010
-    type:             exitcode-stdio-1.0
-    hs-source-dirs:   test
-    main-is:          MyLibTest.hs
-    build-depends:    base ^>=4.14.3.0
+  hs-source-dirs:  src
+
+test-suite test
+  import:         lang
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Main.hs
+  other-modules:
+    System.CGroup.CPUSpec
+    System.CGroup.TypesSpec
+
+  build-depends:
+    , base                 ^>=4.14.3.0
+    , cgroup-capabilities
+    , path
+    , path-io
+    , sandwich
