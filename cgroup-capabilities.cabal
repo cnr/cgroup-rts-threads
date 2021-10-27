@@ -2,14 +2,19 @@ cabal-version:      3.0
 name:               cgroup-capabilities
 version:            0.1.0.0
 synopsis:
-  Set the number of GHC runtime threads based on cgroups cpu limits (cfs quota)
+  A container-/cgroup-aware replacement for the GHC RTS `-N` flag
+
+description:
+  A container-/cgroup-aware replacement for the GHC RTS `-N` flag. See the README for details.
 
 homepage:           https://github.com/cnr/cgroup-capabilities
 license:            MPL-2.0
 license-file:       LICENSE
 author:             Connor James
 maintainer:         connornjames@gmail.com
-extra-source-files: CHANGELOG.md
+extra-source-files:
+  CHANGELOG.md
+  README.md
 
 common lang
   default-language:   Haskell2010
@@ -51,8 +56,8 @@ test-suite test
     System.CGroup.TypesSpec
 
   build-depends:
-    , base                 ^>=4.14.3.0
+    , base
     , cgroup-capabilities
     , path
     , path-io
-    , sandwich
+    , sandwich ^>=0.1.0.9

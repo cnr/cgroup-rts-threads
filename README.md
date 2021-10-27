@@ -1,10 +1,12 @@
 # cgroup-capabilities
 
-This library sets the number of runtime threads ("capabilities") in GHC's RTS. It is meant to be used as a replacement for [the `-N` RTS flag][rts-n]
+This library sets the number of runtime threads ("capabilities") in GHC's RTS. It is meant to be used as a replacement for [the `-N` RTS flag][rts-n].
 
 Similar to the `-N` RTS flag, this library considers the number of cpu cores (as reported by `GHC.Conc.getNumProcessors`) to set this number.
 
 Unlike the `-N` RTS flag, this library observes the process' [cgroup cpu quota][cgroup-quota] to constrain the number of runtime threads, as applicable.
+
+When running outside of a cgroup, or on a platform other than linux, this library matches the behavior of `-N`.
 
 See the [Why?](#why) section for details.
 
