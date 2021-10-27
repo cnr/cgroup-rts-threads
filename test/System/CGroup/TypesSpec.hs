@@ -7,10 +7,11 @@ import Path
 import Path.IO (resolveFile')
 import System.CGroup.Types
 import System.Info (os)
-import Test.Sandwich (CoreSpec, describe, it, shouldBe)
+import Test.Hspec.Core.Spec (Spec, describe, it)
+import Test.Hspec.Expectations (shouldBe)
 
 -- This test won't work on Windows, because paths starting with `/` are invalid
-tests :: CoreSpec
+tests :: Spec
 tests = exceptOnWindows $ do
   describe "resolveGroupController" $ do
     it "should work on a real world example" $ do

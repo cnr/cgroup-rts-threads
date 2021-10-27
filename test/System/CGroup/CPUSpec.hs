@@ -6,9 +6,10 @@ import Control.Monad.IO.Class (liftIO)
 import Path.IO (resolveDir')
 import System.CGroup.CPU
 import System.CGroup.Types (Controller (..))
-import Test.Sandwich (CoreSpec, describe, it, shouldBe)
+import Test.Hspec.Core.Spec (Spec, describe, it)
+import Test.Hspec.Expectations (shouldBe)
 
-tests :: CoreSpec
+tests :: Spec
 tests = do
   describe "getCPUQuota" $ do
     it "should return CPUQuota when there is a quota" $ do

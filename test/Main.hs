@@ -4,12 +4,13 @@ module Main (
 
 import qualified System.CGroup.CPUSpec as CPUSpec
 import qualified System.CGroup.TypesSpec as TypesSpec
-import Test.Sandwich (CoreSpec, defaultOptions, runSandwich)
+import Test.Hspec.Core.Runner (hspec)
+import Test.Hspec.Core.Spec (Spec)
 
 main :: IO ()
-main = runSandwich defaultOptions tests
+main = hspec tests
 
-tests :: CoreSpec
+tests :: Spec
 tests = do
   CPUSpec.tests
   TypesSpec.tests
