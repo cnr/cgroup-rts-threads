@@ -21,7 +21,6 @@ common lang
   default-extensions:
     OverloadedStrings
     ScopedTypeVariables
-    ImportQualifiedPost
 
   ghc-options:
     -Wall -Wincomplete-uni-patterns -Wcompat

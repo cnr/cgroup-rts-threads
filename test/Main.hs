@@ -2,8 +2,8 @@ module Main (
   main,
 ) where
 
-import System.CGroup.CPUSpec qualified as CPUSpec
-import System.CGroup.TypesSpec qualified as TypesSpec
+import qualified System.CGroup.CPUSpec as CPUSpec
+import qualified System.CGroup.TypesSpec as TypesSpec
 import Test.Sandwich (CoreSpec, defaultOptions, runSandwich)
 
 main :: IO ()

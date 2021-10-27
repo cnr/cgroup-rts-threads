@@ -24,13 +24,13 @@ import Data.Char (isSpace)
 import Data.Foldable (find)
 import Data.Maybe (listToMaybe, mapMaybe)
 import Data.Text (Text)
-import Data.Text qualified as Text
-import Data.Text.IO qualified as TIO
+import qualified Data.Text as Text
+import qualified Data.Text.IO as TIO
 import Data.Void (Void)
 import Path
 import Text.Megaparsec (Parsec, eof, manyTill, optional, parse, skipMany, some, takeWhile1P, takeWhileP)
 import Text.Megaparsec.Char (char)
-import Text.Megaparsec.Char.Lexer qualified as L
+import qualified Text.Megaparsec.Char.Lexer as L
 
 -- | A CGroup controller path for a specific subsystem
 newtype Controller a = Controller {unController :: Path Abs Dir}
