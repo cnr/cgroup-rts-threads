@@ -34,9 +34,9 @@ library
     System.CGroup.Types
 
   build-depends:
-    , base        ^>=4.14.3.0
-    , megaparsec
-    , path
+    , base        >=4.13 && <5
+    , megaparsec  >=8    && <10
+    , path        >=0.7  && <0.10
     , text
 
   hs-source-dirs:  src
