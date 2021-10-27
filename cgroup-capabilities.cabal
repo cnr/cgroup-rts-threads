@@ -24,6 +24,7 @@ common lang
   default-extensions:
     OverloadedStrings
     ImportQualifiedPost
+    ScopedTypeVariables
 
   ghc-options:
     -Wall -Wincomplete-uni-patterns -Wcompat
@@ -35,6 +36,7 @@ library
 
   -- cabal-fmt: expand src
   exposed-modules:
+    Control.Concurrent.CGroup
     System.CGroup
     System.CGroup.CPU
     System.CGroup.Types
