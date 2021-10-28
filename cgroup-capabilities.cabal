@@ -2,10 +2,10 @@ cabal-version:      3.0
 name:               cgroup-capabilities
 version:            0.1.0.0
 synopsis:
-  A container-/cgroup-aware replacement for the GHC RTS `-N` flag
+  A container-/cgroup-aware substitute for the GHC RTS `-N` flag
 
 description:
-  A container-/cgroup-aware replacement for the GHC RTS `-N` flag. See the README for details.
+  This library provides a container-/cgroup-aware substitute for the GHC RTS `-N` flag. See the README for details.
 
 homepage:           https://github.com/cnr/cgroup-capabilities
 license:            MPL-2.0

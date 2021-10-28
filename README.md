@@ -3,11 +3,11 @@
 ![Hackage](https://img.shields.io/hackage/v/cgroup-capabilities)
 ![CI](https://github.com/cnr/cgroup-capabilities/actions/workflows/build.yml/badge.svg)
 
-This library sets the number of runtime threads ("capabilities") in GHC's RTS. It is meant to be used as a replacement for [the `-N` RTS flag][rts-n].
+This library provides a container-/cgroup-aware substitute for GHC's [RTS `-N` flag][rts-n], used to set the number of runtime threads.
 
-Similar to the `-N` RTS flag, this library considers the number of cpu cores (as reported by `GHC.Conc.getNumProcessors`) to set this number.
+Similar to the RTS `-N` flag, this library considers the number of cpu cores (as reported by `GHC.Conc.getNumProcessors`) to set this number.
 
-Unlike the `-N` RTS flag, this library observes the process' [cgroup cpu quota][cgroup-quota] to constrain the number of runtime threads, as applicable.
+Unlike the RTS `-N` flag, this library observes the process' [cgroup cpu quota][cgroup-quota] to constrain the number of runtime threads, as applicable.
 
 When running outside of a cgroup, or on a platform other than linux, this library matches the behavior of `-N`.
 
@@ -15,7 +15,7 @@ See the [Why?](#why) section for details.
 
 ## Usage
 
-1. Remove `-N` from your executable's `ghc-options`. In `yourproject.cabal`:
+1. Remove `-N` from your executable's `rtsopts`. In `yourproject.cabal`:
 
 ```cabal-config
 -- before
@@ -49,9 +49,9 @@ It's common in containerized environments to limit cpu consumption of individual
 
 The GHC threaded RTS offers [a flag, `-N`,][rts-n] that can be used to automatically determine the number of "capabilities" (threads) to use, based on the number of physical processors.
 
-The `-N` flag, [as of GHC `9.0.1`][cpuset-commit], respects the `cpuset` option when automatically determining the number of capabilities to use.
+The RTS `-N` flag, [as of GHC `9.0.1`][cpuset-commit], respects the `cpuset` option when automatically determining the number of capabilities to use.
 
-Unfortunately, GHC's RTS **does not support cgroup `cfs` quotas**. This leads to substantially degraded performance when there's a large disparity between a `cfs` quota and the number of physical cpu cores -- a very common scenario in, e.g., production kubernetes clusters.
+Unfortunately, the RTS `-N` flag **does not respect cgroup `cfs` quotas**. This leads to substantially degraded performance when there's a large disparity between a `cfs` quota and the number of physical cpu cores -- a very common scenario in, e.g., production kubernetes clusters.
 
 [cpuset-commit]: https://gitlab.haskell.org/ghc/ghc/-/commit/4413828b7c507872c56719fb8920e1c2322830f8
 [rts-n]: https://downloads.haskell.org/~ghc/9.0.1/docs/html/users_guide/using-concurrent.html#rts-options-for-smp-parallelism
