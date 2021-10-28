@@ -1,5 +1,8 @@
 # cgroup-capabilities
 
+![Hackage](https://img.shields.io/hackage/v/cgroup-capabilities)
+![CI](https://github.com/cnr/cgroup-capabilities/actions/workflows/build.yml/badge.svg)
+
 This library sets the number of runtime threads ("capabilities") in GHC's RTS. It is meant to be used as a replacement for [the `-N` RTS flag][rts-n].
 
 Similar to the `-N` RTS flag, this library considers the number of cpu cores (as reported by `GHC.Conc.getNumProcessors`) to set this number.
