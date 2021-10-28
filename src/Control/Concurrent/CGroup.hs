@@ -1,41 +1,46 @@
 module Control.Concurrent.CGroup (
-  initCapabilities,
+  initRTSThreads,
 ) where
 
 import Control.Exception (Exception (..), SomeAsyncException (SomeAsyncException), SomeException, catch, throwIO)
 import GHC.Conc (getNumProcessors, setNumCapabilities)
 import System.CGroup.CPU (CPUQuota (..), getCPUQuota, resolveCPUController)
 
--- | Sets the number of available capabilities via 'GHC.Conc.setNumCapabilities'
+-- | A container-/cgroup-aware substitute for GHC's RTS @-N@ flag.
 --
--- On most platforms, this sets the number of capabilities to the number of
--- physical processors (see 'GHC.Conc.getNumProcessors').
+-- On most platforms, this sets the number of runtime threads to match the
+-- number of physical processors (see 'GHC.Conc.getNumProcessors'), which is the
+-- default behavior of the GHC @-N@ flag.
 --
 -- When running within a cgroup on linux (most often within a container), this
--- takes into account the available cpu quota
-initCapabilities :: IO ()
-initCapabilities =
-  initCapabilitiesFromCGroup
-    `safeCatch` (\(_ :: SomeException) -> defaultInitCapabilities)
-
--- | Uses the current process' cgroup cfs quota to set the number of available
--- capabilities.
+-- observes the current process' cgroup cpu quota to constrain the number of
+-- runtime threads.
 --
--- Throws an Exception when the current process is not running within a cgroup
-initCapabilitiesFromCGroup :: IO ()
-initCapabilitiesFromCGroup = do
+-- See 'CPUQuota'
+initRTSThreads :: IO ()
+initRTSThreads =
+  initRTSThreadsFromCGroup
+    `safeCatch` (\(_ :: SomeException) -> defaultInitRTSThreads)
+
+-- | Uses the current process' cgroup cpu quota to set the number of runtime
+-- threads.
+--
+-- Throws an Exception when the current process is not running within a cgroup.
+initRTSThreadsFromCGroup :: IO ()
+initRTSThreadsFromCGroup = do
   cpuController <- resolveCPUController
   cgroupCpuQuota <- getCPUQuota cpuController
   case cgroupCpuQuota of
-    NoQuota -> defaultInitCapabilities
+    NoQuota -> defaultInitRTSThreads
     CPUQuota quota period -> do
       procs <- getNumProcessors
       let capabilities = clamp 1 procs (quota `div` period)
       setNumCapabilities capabilities
 
--- | Set number of capabilities to the number of available processors
-defaultInitCapabilities :: IO ()
-defaultInitCapabilities = setNumCapabilities =<< getNumProcessors
+-- | Set number of runtime threads to the number of available processors. This
+-- matches the behavior of GHC's RTS @-N@ flag.
+defaultInitRTSThreads :: IO ()
+defaultInitRTSThreads = setNumCapabilities =<< getNumProcessors
 
 -- | Clamp a value within a range
 clamp :: Int -> Int -> Int -> Int

@@ -1,7 +1,7 @@
-# cgroup-capabilities
+# cgroup-rts-threads
 
-![Hackage](https://img.shields.io/hackage/v/cgroup-capabilities)
-![tests](https://github.com/cnr/cgroup-capabilities/actions/workflows/tests.yml/badge.svg)
+![Hackage](https://img.shields.io/hackage/v/cgroup-rts-threads)
+![tests](https://github.com/cnr/cgroup-rts-threads/actions/workflows/tests.yml/badge.svg)
 
 This library provides a container-/cgroup-aware substitute for GHC's [RTS `-N` flag][rts-n], used to set the number of runtime threads.
 
@@ -27,16 +27,16 @@ executable my-executable
   ghc-options: -threaded
 ```
 
-2. In your program's `main` function, call `initCapabilities`:
+2. In your program's `main` function, call `initRTSThreads`:
 
 ```haskell
 module Main (main) where
 
-import Control.Concurrent.CGroup (initCapabilities)
+import Control.Concurrent.CGroup (initRTSThreads)
 
 main :: IO ()
 main = do
-  initCapabilities
+  initRTSThreads
   [...]
 ```
 
@@ -47,9 +47,9 @@ It's common in containerized environments to limit cpu consumption of individual
 1. The `cpuset` option within a cgroup, which can be used to pin a process to specific cpu cores.
 2. The `cfs.cpu_quota_us` option within a cgroup, which can be used to set a limit on the cpu time a process is allowed to consume.
 
-The GHC threaded RTS offers [a flag, `-N`,][rts-n] that can be used to automatically determine the number of "capabilities" (threads) to use, based on the number of physical processors.
+The GHC threaded RTS offers [a flag, `-N`,][rts-n] that can be used to automatically determine the number of threads to use, based on the number of physical processors.
 
-The RTS `-N` flag, [as of GHC `9.0.1`][cpuset-commit], respects the `cpuset` option when automatically determining the number of capabilities to use.
+The RTS `-N` flag, [as of GHC `9.0.1`][cpuset-commit], respects the `cpuset` option when automatically determining the number of threads to use.
 
 Unfortunately, the RTS `-N` flag **does not respect cgroup `cfs` quotas**. This leads to substantially degraded performance when there's a large disparity between a `cfs` quota and the number of physical cpu cores -- a very common scenario in, e.g., production kubernetes clusters.
 

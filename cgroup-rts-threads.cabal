@@ -1,5 +1,5 @@
 cabal-version:      3.0
-name:               cgroup-capabilities
+name:               cgroup-rts-threads
 version:            0.1.0.0
 synopsis:
   A container-/cgroup-aware substitute for the GHC RTS `-N` flag
@@ -7,7 +7,7 @@ synopsis:
 description:
   This library provides a container-/cgroup-aware substitute for the GHC RTS `-N` flag. See the README for details.
 
-homepage:           https://github.com/cnr/cgroup-capabilities
+homepage:           https://github.com/cnr/cgroup-rts-threads
 license:            MPL-2.0
 license-file:       LICENSE
 author:             Connor James
@@ -56,7 +56,7 @@ test-suite test
 
   build-depends:
     , base
-    , cgroup-capabilities
+    , cgroup-rts-threads
     , path
     , path-io
     , hspec-core ^>=2.8.3
