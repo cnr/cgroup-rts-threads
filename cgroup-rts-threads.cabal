@@ -5,16 +5,23 @@ synopsis:
   A container-/cgroup-aware substitute for the GHC RTS `-N` flag
 
 description:
-  This library provides a container-/cgroup-aware substitute for the GHC RTS `-N` flag. See the README for details.
+  This library provides a container-/cgroup-aware substitute for the GHC RTS
+  `-N` flag. See the README for details.
 
 homepage:           https://github.com/cnr/cgroup-rts-threads
+bug-reports:        https://github.com/cnr/cgroup-rts-threads/issues
 license:            MPL-2.0
 license-file:       LICENSE
+category:           Concurrency
 author:             Connor James
 maintainer:         connornjames@gmail.com
 extra-source-files:
   CHANGELOG.md
   README.md
+
+source-repository head
+  type:     git
+  location: https://github.com/cnr/cgroup-rts-threads.git
 
 common lang
   default-language:   Haskell2010
@@ -57,7 +64,7 @@ test-suite test
   build-depends:
     , base
     , cgroup-rts-threads
+    , hspec-core          ^>=2.8.3
+    , hspec-expectations  ^>=0.8.2
     , path
     , path-io
-    , hspec-core ^>=2.8.3
-    , hspec-expectations ^>=0.8.2
