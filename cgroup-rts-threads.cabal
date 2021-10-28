@@ -42,7 +42,8 @@ library
     Control.Concurrent.CGroup
     System.CGroup
     System.CGroup.CPU
-    System.CGroup.Types
+    System.CGroup.Controller
+    System.CGroup.Controller.Internal
 
   build-depends:
     , base        >=4.13 && <5
@@ -59,7 +60,7 @@ test-suite test
   main-is:        Main.hs
   other-modules:
     System.CGroup.CPUSpec
-    System.CGroup.TypesSpec
+    System.CGroup.ControllerSpec
 
   build-depends:
     , base

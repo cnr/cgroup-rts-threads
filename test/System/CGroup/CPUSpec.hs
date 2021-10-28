@@ -5,7 +5,7 @@ module System.CGroup.CPUSpec (
 import Control.Monad.IO.Class (liftIO)
 import Path.IO (resolveDir')
 import System.CGroup.CPU
-import System.CGroup.Types (Controller (..))
+import System.CGroup.Controller (Controller (..))
 import Test.Hspec.Core.Spec (Spec, describe, it)
 import Test.Hspec.Expectations (shouldBe)
 

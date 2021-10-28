@@ -13,7 +13,7 @@ module System.CGroup.CPU (
 
 import Control.Monad ((<=<))
 import Path
-import System.CGroup.Types (Controller (..), resolveCGroupController)
+import System.CGroup.Controller (Controller (..), resolveCGroupController)
 
 -- | The "cpu" cgroup controller
 data CPU
