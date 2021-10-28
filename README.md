@@ -1,7 +1,7 @@
 # cgroup-capabilities
 
 ![Hackage](https://img.shields.io/hackage/v/cgroup-capabilities)
-![CI](https://github.com/cnr/cgroup-capabilities/actions/workflows/build.yml/badge.svg)
+![tests](https://github.com/cnr/cgroup-capabilities/actions/workflows/tests.yml/badge.svg)
 
 This library provides a container-/cgroup-aware substitute for GHC's [RTS `-N` flag][rts-n], used to set the number of runtime threads.
 
