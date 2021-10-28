@@ -1,3 +1,5 @@
+-- | This module provides a container-/cgroup-aware substitute for GHC's RTS
+-- @-N@ flag. See 'initRTSThreads'.
 module Control.Concurrent.CGroup (
   initRTSThreads,
 ) where

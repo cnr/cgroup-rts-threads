@@ -1,3 +1,4 @@
+-- | Common types and operations for CGroup controllers.
 module System.CGroup.Types (
   -- * CGroup Controllers
   Controller (..),
@@ -16,6 +17,7 @@ module System.CGroup.Types (
   tryResolveMount,
   parseMountInfo,
   parseCGroups,
+  Parser,
 ) where
 
 import Control.Exception (throwIO)
@@ -38,20 +40,28 @@ newtype Controller a = Controller {unController :: Path Abs Dir}
 
 -- | Resolve a CGroup controller's filepath, as viewed by the current process
 --
--- see cgroups(7): /proc/self/cgroup is a file that contains information about
+-- see cgroups(7): \/proc\/self\/cgroup is a file that contains information about
 -- control groups applied to this process
 --
--- see proc(5): /proc/self/mountinfo is a file that contains information about
+-- see proc(5): \/proc\/self\/mountinfo is a file that contains information about
 -- mounts available to this process
 --
--- Because these aren't valid paths on Windows, we have to parse them into @Path Abs File@ at runtime
+-- Because these aren't valid paths on Windows, we have to parse them into @Path
+-- Abs File@ at runtime
+--
+-- Throws an Exception when the controller is not able to be found, or when
+-- running outside of a cgroup
 resolveCGroupController :: Text -> IO (Controller a)
 resolveCGroupController controller = do
   cgroupPath <- parseAbsFile "/proc/self/cgroup"
   mountinfoPath <- parseAbsFile "/proc/self/mountinfo"
   resolveCGroupController' cgroupPath mountinfoPath controller
 
--- | Resolve a CGroup controller's filepath, under the given cgroup and mountinfo paths
+-- | Resolve a CGroup controller's filepath, under the given cgroup and
+-- mountinfo paths
+--
+-- Throws an Exception when the controller is not able to be found, or when
+-- running outside of a cgroup
 resolveCGroupController' :: Path Abs File -> Path Abs File -> Text -> IO (Controller a)
 resolveCGroupController' cgroupPath mountinfoPath controllerName = do
   cgroups <- parseFile parseCGroups cgroupPath
@@ -71,7 +81,7 @@ parseFile parser file = either throwIO pure . parse parser (toFilePath file) =<<
 --
 -- For cgroups version 2, we use @emptyControllers@ to find a cgroup without any controllers
 --
--- see cgroups(7): /proc/[pid]/cgroup section
+-- see cgroups(7): \/proc\/[pid]\/cgroup section
 findMatchingCGroup :: Text -> [CGroup] -> Maybe CGroup
 findMatchingCGroup controllerName = find (\group -> containsController group || emptyControllers group)
   where
@@ -120,20 +130,20 @@ tryResolveMount controllerName cgroup mount = do
 
 -----
 
--- | A cgroup, as viewed within /proc/[pid]/cgroup
+-- | A cgroup, as viewed within \/proc\/[pid]\/cgroup
 --
--- see cgroups(7): /proc/[pid]/cgroup section
+-- see cgroups(7): \/proc\/[pid]\/cgroup section
 data CGroup = CGroup
   { controlGroupControllers :: [Text]
   , controlGroupPath :: Path Abs Dir
   }
   deriving (Show)
 
--- | Parse an entire /proc/[pid]/cgroup file into a list of cgroups
+-- | Parse an entire \/proc\/[pid]\/cgroup file into a list of cgroups
 parseCGroups :: Parser [CGroup]
 parseCGroups = some parseSingleCGroup <* eof
 
--- | Parse a single cgroup line within /proc/[pid]/cgroup
+-- | Parse a single cgroup line within \/proc\/[pid]\/cgroup
 --
 -- hierarchyID:list,of,controllers:path
 --
@@ -141,7 +151,7 @@ parseCGroups = some parseSingleCGroup <* eof
 --
 -- In cgroups version 2, the "controllers" section is always an empty string
 --
--- see cgroups(7): /proc/[pid]/cgroup section
+-- see cgroups(7): \/proc\/[pid]\/cgroup section
 parseSingleCGroup :: Parser CGroup
 parseSingleCGroup =
   CGroup
@@ -173,9 +183,9 @@ splitOnIgnoreEmpty s str = Text.splitOn s str
 
 --------------
 
--- | A mount, as viewed within /proc/[pid]/mountinfo
+-- | A mount, as viewed within \/proc\/[pid]\/mountinfo
 --
--- see proc(5): /proc/[pid]/mountinfo section
+-- see proc(5): \/proc\/[pid]\/mountinfo section
 data Mount = Mount
   { mountId :: Text
   , mountParentId :: Text
@@ -190,15 +200,15 @@ data Mount = Mount
   }
   deriving (Show)
 
--- | Parse an entire /proc/[pid]/mountinfo file into a list of mounts
+-- | Parse an entire \/proc\/[pid]\/mountinfo file into a list of mounts
 parseMountInfo :: Parser [Mount]
 parseMountInfo = some parseSingleMount <* eof
 
--- | Parse a single mount line within /proc/[pid]/mountinfo
+-- | Parse a single mount line within \/proc\/[pid]\/mountinfo
 --
 -- Fields are space-separated
 --
--- see proc(5): /proc/[pid]/mountinfo section
+-- see proc(5): \/proc\/[pid]\/mountinfo section
 parseSingleMount :: Parser Mount
 parseSingleMount =
   Mount
@@ -214,6 +224,7 @@ parseSingleMount =
     <*> (splitOnIgnoreEmpty "," <$> field) -- super options
     <* optional (char '\n')
 
+-- | Megaparsec Parser
 type Parser = Parsec Void Text
 
 -- a field in the mountinfo file, terminated by whitespace

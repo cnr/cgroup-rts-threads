@@ -1,5 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
+-- | Types and operations for the CPU CGroup controller.
 module System.CGroup.CPU (
   -- * The CPU cgroup controller
   CPU,
@@ -17,6 +18,10 @@ import System.CGroup.Types (Controller (..), resolveCGroupController)
 -- | The "cpu" cgroup controller
 data CPU
 
+-- | Resolve the CPU cgroup controller for the current process
+--
+-- Throws an Exception if the CPU controller is not able to be found, or when
+-- running outside of a cgroup
 resolveCPUController :: IO (Controller CPU)
 resolveCPUController = resolveCGroupController "cpu"
 
@@ -25,12 +30,14 @@ resolveCPUController = resolveCGroupController "cpu"
 --
 -- For example:
 --
+-- @
 -- | cpu.cfs_quota_us | cpu.cfs_period_us | description |
 -- | ---------------- | ----------------- | ----------- |
 -- |           100000 |            100000 | (1)         |
 -- |           200000 |            100000 | (2)         |
 -- |            50000 |            100000 | (3)         |
 -- |               -1 |            100000 | (4)         |
+-- @
 --
 -- (1): we can use up to a single CPU core
 --
@@ -49,7 +56,7 @@ data CPUQuota
 readCGroupInt :: Path b File -> IO Int
 readCGroupInt = readIO <=< (readFile . toFilePath)
 
--- | Get the process CPU quota
+-- | Get the CPU quota within the given cgroup CPU controller
 getCPUQuota :: Controller CPU -> IO CPUQuota
 getCPUQuota (Controller root) = do
   quota <- readCGroupInt (root </> cpuQuotaPath)

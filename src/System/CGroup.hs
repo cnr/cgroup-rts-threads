@@ -1,3 +1,4 @@
+-- | CGroup controller types and operations (re-exported from System.CGroup.*)
 module System.CGroup (
   module X,
 ) where
