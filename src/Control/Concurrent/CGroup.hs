@@ -5,8 +5,11 @@ module Control.Concurrent.CGroup (
 ) where
 
 import Control.Exception (Exception (..), SomeAsyncException (SomeAsyncException), SomeException, catch, throwIO)
+import qualified Data.Ratio as Ratio
 import GHC.Conc (getNumProcessors, setNumCapabilities)
-import System.CGroup.CPU (CPUQuota (..), getCPUQuota, resolveCPUController)
+import System.CGroup.Types (CPUQuota (..))
+import qualified System.CGroup.V1.CPU as V1
+import qualified System.CGroup.V2.CPU as V2
 
 -- | A container-/cgroup-aware substitute for GHC's RTS @-N@ flag.
 --
@@ -20,24 +23,20 @@ import System.CGroup.CPU (CPUQuota (..), getCPUQuota, resolveCPUController)
 --
 -- See 'CPUQuota'
 initRTSThreads :: IO ()
-initRTSThreads =
-  initRTSThreadsFromCGroup
-    `safeCatch` (\(_ :: SomeException) -> defaultInitRTSThreads)
+initRTSThreads = do
+  quota <-
+    V1.getProcessCPUQuota
+      `fallback` V2.getProcessEffectiveCPUQuota
+      `fallback` pure NoQuota
+  initRTSThreadsFromQuota quota
 
--- | Uses the current process' cgroup cpu quota to set the number of runtime
--- threads.
---
--- Throws an Exception when the current process is not running within a cgroup.
-initRTSThreadsFromCGroup :: IO ()
-initRTSThreadsFromCGroup = do
-  cpuController <- resolveCPUController
-  cgroupCpuQuota <- getCPUQuota cpuController
-  case cgroupCpuQuota of
-    NoQuota -> defaultInitRTSThreads
-    CPUQuota quota period -> do
-      procs <- getNumProcessors
-      let capabilities = clamp 1 procs (quota `div` period)
-      setNumCapabilities capabilities
+-- | Use a CPU quota to set the number of runtime threads.
+initRTSThreadsFromQuota :: CPUQuota -> IO ()
+initRTSThreadsFromQuota NoQuota = defaultInitRTSThreads
+initRTSThreadsFromQuota (CPUQuota ratio) = do
+  procs <- getNumProcessors
+  let capabilities = clamp 1 procs (Ratio.numerator ratio `div` Ratio.denominator ratio)
+  setNumCapabilities capabilities
 
 -- | Set number of runtime threads to the number of available processors. This
 -- matches the behavior of GHC's RTS @-N@ flag.
@@ -57,3 +56,7 @@ isSyncException e =
   case fromException (toException e) of
     Just (SomeAsyncException _) -> False
     Nothing -> True
+
+-- | Return the result of the first successful action
+fallback :: IO a -> IO a -> IO a
+fallback a b = a `safeCatch` (\(_ :: SomeException) -> b)
