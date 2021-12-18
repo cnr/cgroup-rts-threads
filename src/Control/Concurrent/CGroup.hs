@@ -17,7 +17,6 @@ import qualified System.CGroup.V2.CPU as V2
 -- determines how to round the CPU quota to get to the number of capabilities.
 --
 -- The names correspond to the similarly named methods of 'RealFrac'.
---
 data RoundQuota
   = CeilingQuota
   | FloorQuota
