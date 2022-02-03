@@ -1,6 +1,6 @@
 # Revision history for cgroup-rts-threads
 
-## Unreleased
+## 0.2.1.0
 
 - Support configuring the rounding mode for the CPU quota to capabilities conversion
 
