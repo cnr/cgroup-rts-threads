@@ -2,6 +2,8 @@
 -- @-N@ flag. See 'initRTSThreads'.
 module Control.Concurrent.CGroup (
   initRTSThreads,
+  initRTSThreadsWith,
+  RoundQuota (..),
 ) where
 
 import Control.Exception (Exception (..), SomeAsyncException (SomeAsyncException), SomeException, catch, throwIO)
@@ -10,6 +12,24 @@ import GHC.Conc (getNumProcessors, setNumCapabilities)
 import System.CGroup.Types (CPUQuota (..))
 import qualified System.CGroup.V1.CPU as V1
 import qualified System.CGroup.V2.CPU as V2
+
+-- | CPU quotas can be fractions, but the number of RTS capabilities is an integer. This type
+-- determines how to round the CPU quota to get to the number of capabilities.
+--
+-- The names correspond to the similarly named methods of 'RealFrac'.
+data RoundQuota
+  = CeilingQuota
+  | FloorQuota
+  | RoundQuota
+  deriving (Show, Read, Eq, Ord)
+
+-- | Round a quota.
+roundQuota :: RoundQuota -> Ratio.Ratio Int -> Int
+roundQuota roundMode =
+  case roundMode of
+    CeilingQuota -> ceiling
+    FloorQuota -> floor
+    RoundQuota -> round
 
 -- | A container-/cgroup-aware substitute for GHC's RTS @-N@ flag.
 --
@@ -21,22 +41,27 @@ import qualified System.CGroup.V2.CPU as V2
 -- observes the current process' cgroup cpu quota to constrain the number of
 -- runtime threads.
 --
+-- By default, the number of capabilities is determined by rounding the CPU quota down.
+--
 -- See 'CPUQuota'
 initRTSThreads :: IO ()
-initRTSThreads = do
+initRTSThreads = initRTSThreadsWith FloorQuota
+
+-- | Same as 'initRTSThreads' but lets you specify the quota round mode.
+initRTSThreadsWith :: RoundQuota -> IO ()
+initRTSThreadsWith roundMode = do
   quota <-
     V1.getProcessCPUQuota
       `fallback` V2.getProcessEffectiveCPUQuota
       `fallback` pure NoQuota
-  initRTSThreadsFromQuota quota
+  initRTSThreadsFromQuota roundMode quota
 
 -- | Use a CPU quota to set the number of runtime threads.
-initRTSThreadsFromQuota :: CPUQuota -> IO ()
-initRTSThreadsFromQuota NoQuota = defaultInitRTSThreads
-initRTSThreadsFromQuota (CPUQuota ratio) = do
+initRTSThreadsFromQuota :: RoundQuota -> CPUQuota -> IO ()
+initRTSThreadsFromQuota _ NoQuota = defaultInitRTSThreads
+initRTSThreadsFromQuota roundMode (CPUQuota ratio) = do
   procs <- getNumProcessors
-  let capabilities = clamp 1 procs (Ratio.numerator ratio `div` Ratio.denominator ratio)
-  setNumCapabilities capabilities
+  setNumCapabilities $ clamp 1 procs $ roundQuota roundMode ratio
 
 -- | Set number of runtime threads to the number of available processors. This
 -- matches the behavior of GHC's RTS @-N@ flag.
