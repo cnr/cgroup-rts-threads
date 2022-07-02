@@ -18,6 +18,18 @@ maintainer:         connornjames@gmail.com
 extra-source-files:
   CHANGELOG.md
   README.md
+  test/System/CGroup/**/*.max
+  test/System/CGroup/**/*.cfs_period_us
+  test/System/CGroup/**/*.cfs_quota_us
+  test/System/CGroup/V1/testdata-controller/direct/mountinfo
+  test/System/CGroup/V1/testdata-controller/indirect/cgroup
+  test/System/CGroup/V1/testdata-controller/indirect/mountinfo
+  test/System/CGroup/V1/testdata-controller/realworld/cgroup
+  test/System/CGroup/V1/testdata-controller/realworld/mountinfo
+  test/System/CGroup/V2/testdata-cgroup/nested/cgroup
+  test/System/CGroup/V2/testdata-cgroup/nested/mountinfo
+  test/System/CGroup/V2/testdata-cgroup/root/cgroup
+  test/System/CGroup/V2/testdata-cgroup/root/mountinfo
 
 source-repository head
   type:     git
