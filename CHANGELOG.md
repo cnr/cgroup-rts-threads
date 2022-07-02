@@ -1,8 +1,12 @@
 # Revision history for cgroup-rts-threads
 
+## 0.2.1.1
+
+- Adds tests files to sdist
+
 ## 0.2.1.0
 
-- Support configuring the rounding mode for the CPU quota to capabilities conversion
+- Adds 'initRTSThreadsWith', which allows for changing the rounding behavior when computing the number of capabilities to use
 
 ## 0.2.0.0
 
